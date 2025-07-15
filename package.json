@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/download-webflow.mjs && next build",
+    "build": "node src/webflow/download.js && next build",
+    "download": "node src/webflow/download.js",
     "start": "next start",
     "lint": "next lint"
   },

@@ -7,14 +7,6 @@ export const PAGES_TO_DOWNLOAD = [
   { path: '/legal/terms-and-conditions', outputFile: 'legal/terms-and-conditions.html' },
 ];
 
-// Generate Next.js rewrites from the pages configuration
-export function generateNextJsRewrites() {
-  return PAGES_TO_DOWNLOAD.map(page => ({
-    source: page.path,
-    destination: `/webflow/${page.outputFile}`,
-  }));
-}
-
 // Get all webflow routes for validation
 export function getWebflowRoutes() {
   return PAGES_TO_DOWNLOAD.map(page => page.path);

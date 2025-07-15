@@ -20,7 +20,13 @@
 # production
 /build
 
-/public/webflow/
+# webflow downloaded files (temporary)
+/dist/
+
+# generated webflow files in public root
+/public/index.html
+/public/legal/
+/public/css/
 
 # misc
 .DS_Store

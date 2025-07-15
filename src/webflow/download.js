@@ -3,7 +3,7 @@ import path from 'path';
 import * as cheerio from 'cheerio';
 import { WEBFLOW_BASE_URL, PAGES_TO_DOWNLOAD } from './routes.js';
 
-const OUTPUT_DIR = path.join(process.cwd(), 'public', 'webflow');
+const OUTPUT_DIR = path.join(process.cwd(), 'dist', 'webflow');
 const CSS_DIR = path.join(OUTPUT_DIR, 'css');
 
 const ensureDir = (dirPath) => fs.mkdir(dirPath, { recursive: true });
@@ -32,7 +32,7 @@ async function downloadCss(cssUrl, $, pageUrl) {
     try {
         const cssFileName = path.basename(new URL(cssUrl).pathname);
         const localCssPath = path.join(CSS_DIR, cssFileName);
-        const relativeCssPath = `/webflow/css/${cssFileName}`;
+        const relativeCssPath = `/css/${cssFileName}`;
         
         console.log(`Downloading CSS: ${cssUrl}`);
         const cssResponse = await fetch(cssUrl);
@@ -122,7 +122,7 @@ async function downloadWebflowPage(pagePath, outputFile) {
         if (href) {
             const cssUrl = new URL(href, pageUrl).href;
             const cssFileName = path.basename(new URL(cssUrl).pathname);
-            const relativeCssPath = `/webflow/css/${cssFileName}`;
+            const relativeCssPath = `/css/${cssFileName}`;
             element.attr('href', relativeCssPath);
         }
     });
@@ -148,6 +148,40 @@ async function downloadWebflowPage(pagePath, outputFile) {
   }
 }
 
+async function copyToPublic() {
+  try {
+    const publicDir = path.join(process.cwd(), 'public');
+    
+    // Copy contents of dist/webflow to public root
+    const files = await fs.readdir(OUTPUT_DIR);
+    
+    for (const file of files) {
+      const srcPath = path.join(OUTPUT_DIR, file);
+      const destPath = path.join(publicDir, file);
+      const stat = await fs.stat(srcPath);
+      
+      if (stat.isDirectory()) {
+        // Remove existing directory if it exists
+        try {
+          await fs.rm(destPath, { recursive: true, force: true });
+        } catch (e) {
+          // Directory doesn't exist, ignore
+        }
+        // Copy directory
+        await fs.cp(srcPath, destPath, { recursive: true });
+      } else {
+        // Copy file
+        await fs.copyFile(srcPath, destPath);
+      }
+    }
+    
+    console.log('Copied webflow files to public/ root');
+  } catch (error) {
+    console.error('Error copying files to public:', error);
+    throw error;
+  }
+}
+
 async function downloadAllPages() {
   try {
     console.log('Starting download of all pages...');
@@ -166,6 +200,10 @@ async function downloadAllPages() {
     }
 
     console.log('All pages downloaded successfully!');
+    
+    // Copy downloaded files to public/webflow
+    await copyToPublic();
+    
   } catch (error) {
     console.error('Error in download script:', error);
     process.exit(1);

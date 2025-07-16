@@ -1,0 +1,14 @@
+name = "webflow-test"
+compatibility_date = "2024-01-01"
+
+[build]
+command = "npm run pages:build"
+
+[build.upload]
+format = "service-worker"
+
+[env.production]
+name = "webflow-test"
+
+[env.preview]
+name = "webflow-test-preview" 
